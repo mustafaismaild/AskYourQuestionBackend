@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Documentation - Redoc</title>
+  <!-- Redoc'un en güncel CDN sürümü -->
+  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    redoc {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<!-- Redoc container -->
+<redoc spec-url="/v3/api-docs"></redoc>
+
+<script>
+  // Eğer özelleştirilmiş Redoc başlatmak istersen:
+  // Redoc.init('/v3/api-docs', { scrollYOffset: 50 }, document.body);
+</script>
+</body>
+</html>
