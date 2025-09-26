@@ -2,12 +2,10 @@ package com.example.project.entity.res;
 
 import java.time.LocalDateTime;
 
-public class AnswerResponse {
+public class AnswerResponse extends BaseResponse {
 
     private Long id;
     private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private boolean accepted;
     private Long userId;
     private String username;
@@ -28,12 +26,6 @@ public class AnswerResponse {
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     public boolean isAccepted() { return accepted; }
     public void setAccepted(boolean accepted) { this.accepted = accepted; }

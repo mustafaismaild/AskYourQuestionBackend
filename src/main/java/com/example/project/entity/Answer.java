@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "answers")
-public class Answer {
+public class Answer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,16 +16,10 @@ public class Answer {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     private boolean isAccepted = false;
 
-    @Column(nullable = false)
-    private boolean status = true;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
@@ -60,36 +54,12 @@ public class Answer {
         this.content = content;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public boolean isAccepted() {
         return isAccepted;
     }
 
     public void setAccepted(boolean accepted) {
         isAccepted = accepted;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
     }
 
     public Question getQuestion() {

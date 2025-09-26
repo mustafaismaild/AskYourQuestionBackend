@@ -3,7 +3,7 @@ package com.example.project.entity.res;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class QuestionResponse {
+public class QuestionResponse extends BaseResponse {
 
     private Long id;
     private String title;
@@ -11,8 +11,6 @@ public class QuestionResponse {
     private String fileName;
     private boolean solved;
     private boolean status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private Long userId;
 
     private List<AnswerResponse> answers;
@@ -58,12 +56,6 @@ public class QuestionResponse {
 
     public boolean getStatus() { return status; }
     public void setStatus(boolean status) { this.status = status; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }

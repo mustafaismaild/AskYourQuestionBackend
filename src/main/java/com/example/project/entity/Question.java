@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "questions")
-public class Question {
+public class Question extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,14 +29,6 @@ public class Question {
 
     @Column(nullable = false)
     private boolean isSolved = false;
-
-    @Column(nullable = false)
-    private boolean status = true;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    private LocalDateTime updatedAt;
 
     @ManyToMany
     @JoinTable(
@@ -109,30 +101,6 @@ public class Question {
 
     public void setSolved(boolean solved) {
         isSolved = solved;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public List<Tag> getTags() {

@@ -2,13 +2,11 @@ package com.example.project.entity.res;
 
 import java.time.LocalDateTime;
 
-public class CommentResponse {
+public class CommentResponse extends BaseResponse {
     private Long id;
     private String content;
     private Long userId;
     private Long answerId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private boolean status;
     private int voteCount;
 
@@ -24,12 +22,6 @@ public class CommentResponse {
 
     public Long getAnswerId() { return answerId; }
     public void setAnswerId(Long answerId) { this.answerId = answerId; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     public boolean isStatus() {
         return status;

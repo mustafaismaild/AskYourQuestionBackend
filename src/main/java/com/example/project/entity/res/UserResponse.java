@@ -4,12 +4,10 @@ package com.example.project.entity.res;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class UserResponse {
+public class UserResponse extends BaseResponse {
     private Long id;
     private String username;
     private boolean status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private List<QuestionResponse> questions;
     private List<SavedQuestionResponse> savedQuestions;
 
@@ -36,22 +34,6 @@ public class UserResponse {
 
     public void setStatus(boolean status) {
         this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public List<QuestionResponse> getQuestions() {
