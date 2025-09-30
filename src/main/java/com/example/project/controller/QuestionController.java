@@ -35,14 +35,10 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/getAll")
     public ResponseEntity<List<QuestionResponse>> getActiveQuestions() {
         return ResponseEntity.ok(
                 questionService.getActiveQuestions()
-                        .stream()
-                        .map(QuestionMapper::toResponse)
-                        .toList()
         );
     }
 

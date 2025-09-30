@@ -3,6 +3,8 @@ package com.example.project.repository;
 import com.example.project.entity.Vote;
 import com.example.project.enums.VoteType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,5 +21,9 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     Optional<Vote> findByUserIdAndCommentIdAndStatus(Long userId, Long commentId, boolean status);
     List<Vote> findAllByCommentIdAndStatus( Long commentId, boolean status);
+    @Query("SELECT COALESCE(SUM(v.value), 0) FROM Vote v WHERE v.question.id = :questionId")
+    int sumByQuestionId(@Param("questionId") Long questionId);
+
+    boolean existsByQuestionIdAndUserId(Long questionId, Long userId);
 
 }

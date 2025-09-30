@@ -1,10 +1,14 @@
 package com.example.project.entity.res;
 
-import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import java.util.List;
 
-public class QuestionResponse extends BaseResponse {
 
+@NoArgsConstructor
+@AllArgsConstructor
+public class QuestionResponse extends BaseResponse {
     private Long id;
     private String title;
     private String content;
@@ -12,26 +16,34 @@ public class QuestionResponse extends BaseResponse {
     private boolean solved;
     private boolean status;
     private Long userId;
-
     private List<AnswerResponse> answers;
     private List<String> tags;
+    private int totalVoteScore;
+    private boolean userVoted;
 
-    public List<String> getTags() {
-        return tags;
+    public Long getId() {
+        return id;
     }
 
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public String getFileName() {
         return fileName;
@@ -45,21 +57,55 @@ public class QuestionResponse extends BaseResponse {
         return solved;
     }
 
+    public void setSolved(boolean solved) {
+        this.solved = solved;
+    }
+
     public boolean isStatus() {
         return status;
     }
 
-    public void setSolved(boolean solved) {
-        this.solved = solved; }
-    public void getSolved(boolean solved) {
-        this.solved = solved; }
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
-    public boolean getStatus() { return status; }
-    public void setStatus(boolean status) { this.status = status; }
+    public Long getUserId() {
+        return userId;
+    }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
-    public List<AnswerResponse> getAnswers() { return answers; }
-    public void setAnswers(List<AnswerResponse> answers) { this.answers = answers; }
+    public List<AnswerResponse> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<AnswerResponse> answers) {
+        this.answers = answers;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public int getTotalVoteScore() {
+        return totalVoteScore;
+    }
+
+    public void setTotalVoteScore(int totalVoteScore) {
+        this.totalVoteScore = totalVoteScore;
+    }
+
+    public boolean isUserVoted() {
+        return userVoted;
+    }
+
+    public void setUserVoted(boolean userVoted) {
+        this.userVoted = userVoted;
+    }
 }

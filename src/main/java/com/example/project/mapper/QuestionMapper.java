@@ -3,6 +3,7 @@ package com.example.project.mapper;
 import com.example.project.entity.Question;
 import com.example.project.entity.Tag;
 import com.example.project.entity.res.QuestionResponse;
+import com.example.project.entity.res.AnswerResponse;
 
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class QuestionMapper {
             response.setTags(
                     question.getTags().stream()
                             .map(Tag::getName)
-                            .collect(Collectors.toList())
+                            .toList()
             );
         }
 
@@ -33,13 +34,13 @@ public class QuestionMapper {
             response.setAnswers(
                     question.getAnswers().stream()
                             .map(answer -> {
-                                var ansResp = new com.example.project.entity.res.AnswerResponse();
+                                AnswerResponse ansResp = new AnswerResponse();
                                 ansResp.setId(answer.getId());
                                 ansResp.setContent(answer.getContent());
                                 ansResp.setUserId(answer.getUser() != null ? answer.getUser().getId() : null);
                                 ansResp.setCreatedAt(answer.getCreatedAt());
                                 ansResp.setUpdatedAt(answer.getUpdatedAt());
-                                // question bilgisini eklemiyoruz → döngüyü önler
+                                // Question bilgisi eklemiyoruz → döngüyü önler
                                 return ansResp;
                             })
                             .collect(Collectors.toList())

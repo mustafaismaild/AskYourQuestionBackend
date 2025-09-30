@@ -1,5 +1,6 @@
 package com.example.project.security;
 
+import com.example.project.enums.Role;
 import com.example.project.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -23,28 +25,41 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-
+    // Token oluştur
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("id", user.getId())
-                .claim("roles", user.getRoles() != null ? user.getRoles() : List.of())
+                .claim("roles", user.getRoles()) // Role enum listesi
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    // Token’dan userId çek
+    public Long extractUserId(String token) {
+        return parseClaims(token).get("id", Long.class);
+    }
+
+    // Token’dan username çek
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
     }
 
+    // Token’dan role listesi çek
     @SuppressWarnings("unchecked")
-    public List<String> extractRoles(String token) {
-        Object roles = parseClaims(token).get("roles");
-        return roles != null ? (List<String>) roles : List.of();
+    public List<Role> extractRoles(String token) {
+        Object rolesObj = parseClaims(token).get("roles");
+        if (rolesObj == null) return List.of();
+
+        return ((List<Object>) rolesObj).stream()
+                .map(String::valueOf)
+                .map(Role::valueOf)
+                .collect(Collectors.toList());
     }
 
+    // Token validasyon
     public boolean validateToken(String token, String username) {
         return extractUsername(token).equals(username) && !isTokenExpired(token);
     }

@@ -2,7 +2,7 @@ package com.example.project.entity.res;
 
 import java.time.LocalDateTime;
 
-public abstract class BaseResponse {
+public abstract class   BaseResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

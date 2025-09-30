@@ -3,8 +3,8 @@ package com.example.project.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Entity
 @Table(name = "questions")
@@ -46,6 +46,10 @@ public class Question extends BaseEntity {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Answer> answers;
+    public Question() {
+
+    }
+
 
     public Long getId() {
         return id;

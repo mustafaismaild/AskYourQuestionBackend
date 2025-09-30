@@ -1,7 +1,8 @@
 package com.example.project.service.impl;
 
-import com.example.project.enums.Role;
 import com.example.project.entity.User;
+import com.example.project.entity.res.UserResponse;
+import com.example.project.enums.Role;
 import com.example.project.entity.req.LoginRequest;
 import com.example.project.entity.req.RegisterRequest;
 import com.example.project.entity.res.TokenResponse;
@@ -33,7 +34,6 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RuntimeException("Username already exists!");
         }
-
         if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new RuntimeException("Email already exists!");
         }
@@ -42,23 +42,18 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(request.username());
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setEmail(request.email());
-        user.setRoles(List.of(Role.USER));
+        user.setRoles(List.of(Role.USER)); // Default USER rolü
 
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user);
 
-        return new TokenResponse(
-                token,
-                user.getId(),
-                user.getUsername(),
-                user.getRoles()
-        );
+        return new TokenResponse(token, user.getId(), user.getUsername(), user.getRoles());
     }
 
     @Override
     public TokenResponse login(LoginRequest request) {
-        var user = userRepository.findByUsername(request.username())
+        User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
@@ -67,12 +62,25 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtil.generateToken(user);
 
-        return new TokenResponse(
-                token,
-                user.getId(),
-                user.getUsername(),
-                user.getRoles()
-        );
+        return new TokenResponse(token, user.getId(), user.getUsername(), user.getRoles());
     }
 
+    @Override
+    public UserResponse meFromToken(String token) {
+        String username = jwtUtil.extractUsername(token);
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Role> roles = jwtUtil.extractRoles(token);
+
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setRoles(roles);
+        response.setStatus(user.isStatus());
+
+        return response;
+    }
 }
