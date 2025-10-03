@@ -11,6 +11,7 @@ public class UserResponse extends BaseResponse {
     private List<QuestionResponse> questions;
     private List<SavedQuestionResponse> savedQuestions;
     private List<Role> roles;
+    private String avatarUrl;
 
     public UserResponse(Long id,
                         String username,
@@ -49,4 +50,12 @@ public class UserResponse extends BaseResponse {
 
     public List<Role> getRoles() { return roles; }
     public void setRoles(List<Role> roles) { this.roles = roles; }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 }

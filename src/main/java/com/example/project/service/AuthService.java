@@ -13,4 +13,5 @@ public interface AuthService {
     TokenResponse login(LoginRequest request);
 
     UserResponse meFromToken(String token);
+
 }

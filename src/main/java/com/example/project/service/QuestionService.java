@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface QuestionService {
 
-    QuestionResponse saveQuestion(QuestionRequest questionRequest, Long userId);
+    QuestionResponse saveQuestion(QuestionRequest questionRequest, Long userId, String userName);
 
     Question updateQuestion(Question question, List<String> tagNames);
 
@@ -17,7 +17,9 @@ public interface QuestionService {
 
     void deleteQuestion(Long id);
 
-    void markAsSolved(Question question);
+    void markAsSolved(Long questionId, String username);
+
+    void unsolveQuestion(Long questionId, String username);
 
     List<QuestionResponse> getActiveQuestions();
 

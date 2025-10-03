@@ -12,9 +12,8 @@ public class VoteResponse {
     private Long questionId;
     private Long answerId;
     private Long commentId;
-    private Integer value;
+    private Integer userVote;
     private int totalScore;
-    private boolean userVoted;
 
     public Long getVoteId() {
         return voteId;
@@ -56,12 +55,12 @@ public class VoteResponse {
         this.commentId = commentId;
     }
 
-    public Integer getValue() {
-        return value;
+    public Integer getUserVote() {
+        return userVote;
     }
 
-    public void setValue(Integer value) {
-        this.value = value;
+    public void setUserVote(Integer userVote) {
+        this.userVote = userVote;
     }
 
     public int getTotalScore() {
@@ -70,13 +69,5 @@ public class VoteResponse {
 
     public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
-    }
-
-    public boolean isUserVoted() {
-        return userVoted;
-    }
-
-    public void setUserVoted(boolean userVoted) {
-        this.userVoted = userVoted;
     }
 }

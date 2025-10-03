@@ -47,7 +47,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionResponse saveQuestion(QuestionRequest request, Long userId) {
+    public QuestionResponse saveQuestion(QuestionRequest request, Long userId , String userName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -93,10 +93,49 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void markAsSolved(Question question) {
-        question.setSolved(true);
-        questionRepository.save(question);
+    public void markAsSolved(Long questionId, String username) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Soru bulunamadı"));
+
+        Long ownerId = question.getUser() != null ? question.getUser().getId() : null;
+
+        Long requesterId = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"))
+                .getId();
+
+        if (ownerId == null || !ownerId.equals(requesterId)) {
+            throw new RuntimeException("Yetkisiz işlem");
+        }
+
+        if (!Boolean.TRUE.equals(question.isSolved())) {
+            question.setSolved(true);
+            question.setUpdatedAt(java.time.LocalDateTime.now());
+            questionRepository.save(question);
+        }
     }
+
+    @Override
+    public void unsolveQuestion(Long questionId, String username) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Soru bulunamadı"));
+
+        Long ownerId = question.getUser() != null ? question.getUser().getId() : null;
+
+        Long requesterId = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"))
+                .getId();
+
+        if (ownerId == null || !ownerId.equals(requesterId)) {
+            throw new RuntimeException("Yetkisiz işlem");
+        }
+
+        if (Boolean.TRUE.equals(question.isSolved())) {
+            question.setSolved(false);
+            question.setUpdatedAt(java.time.LocalDateTime.now());
+            questionRepository.save(question);
+        }
+    }
+
 
     @Override
     public List<QuestionResponse> searchSimilarQuestions(String text) {
@@ -111,7 +150,7 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionResponse mapToResponse(Question question, Long userId) {
         QuestionResponse response = new QuestionResponse();
         response.setId(question.getId());
-        response.setUserId(Long.valueOf(question.getUser().getUsername()));
+        response.setUserName(question.getUser().getUsername());
         response.setTitle(question.getTitle());
         response.setContent(question.getContent());
         response.setSolved(question.isSolved());

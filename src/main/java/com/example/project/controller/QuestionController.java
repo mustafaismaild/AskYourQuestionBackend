@@ -7,7 +7,9 @@ import com.example.project.entity.req.QuestionRequest;
 import com.example.project.entity.res.QuestionResponse;
 import com.example.project.entity.CustomUserDetails;
 import com.example.project.service.QuestionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +33,7 @@ public class QuestionController {
             @RequestBody QuestionRequest questionRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        QuestionResponse response = questionService.saveQuestion(questionRequest, userDetails.getId());
+        QuestionResponse response = questionService.saveQuestion(questionRequest, userDetails.getId(), userDetails.getUsername());
         return ResponseEntity.ok(response);
     }
 
@@ -74,14 +76,18 @@ public class QuestionController {
 
 
     @PutMapping("/{id}/solve")
-    public ResponseEntity<Void> markAsSolved(@PathVariable Long id) {
-        Optional<Question> questionOpt = questionService.getQuestionById(id);
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<Void> markAsSolved(@PathVariable Long id, Authentication auth) {
+        String username = auth.getName();
+        questionService.markAsSolved(id, username);
+        return ResponseEntity.ok().build();
+    }
 
-        if (questionOpt.isPresent()) {
-            questionService.markAsSolved(questionOpt.get());
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}/solve")
+    @SecurityRequirement(name = "BearerAuth")
+    public ResponseEntity<Void> unsolve(@PathVariable Long id, Authentication auth) {
+        String username = auth.getName();
+        questionService.unsolveQuestion(id, username);
+        return ResponseEntity.noContent().build();
     }
 }

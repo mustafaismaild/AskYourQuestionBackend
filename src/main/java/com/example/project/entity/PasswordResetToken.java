@@ -1,6 +1,8 @@
 package com.example.project.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +17,10 @@ public class PasswordResetToken {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime expiryDate;
@@ -41,6 +47,14 @@ public class PasswordResetToken {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public LocalDateTime getExpiryDate() {

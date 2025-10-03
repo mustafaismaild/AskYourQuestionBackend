@@ -2,18 +2,9 @@ package com.example.project.entity;
 
 import com.example.project.enums.VoteType;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "votes")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Vote extends BaseEntity {
 
     @Id
@@ -42,6 +33,8 @@ public class Vote extends BaseEntity {
 
     @Column(nullable = false)
     private Integer value;
+
+    // ---------- MANUEL GETTER / SETTER ----------
 
     public Long getId() {
         return id;
@@ -98,5 +91,4 @@ public class Vote extends BaseEntity {
     public void setValue(Integer value) {
         this.value = value;
     }
-
 }

@@ -41,6 +41,9 @@ public class User extends BaseEntity{
     @JsonManagedReference
     private Set<Question> questions = new HashSet<>();
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<SavedQuestion> savedQuestions = new HashSet<>();
 
@@ -90,6 +93,14 @@ public class User extends BaseEntity{
 
     public void setQuestions(Set<Question> questions) {
         this.questions = questions;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public Set<SavedQuestion> getSavedQuestions() {

@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class QuestionResponse extends BaseResponse {
     private Long id;
+    private String userName;
     private String title;
     private String content;
     private String fileName;
@@ -27,6 +28,14 @@ public class QuestionResponse extends BaseResponse {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getTitle() {

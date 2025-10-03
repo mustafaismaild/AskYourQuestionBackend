@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 AntPathRequestMatcher.antMatcher("/api/auth/register"),
                                 AntPathRequestMatcher.antMatcher("/api/auth/login"),
+                                AntPathRequestMatcher.antMatcher("/api/questions/getAll"),
                                 AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
                                 AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
                                 AntPathRequestMatcher.antMatcher("/redoc.html"),
@@ -82,21 +83,18 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // setAllowedOriginPatterns tercih edilir, ancak allowedOrigins da kullanılabilir
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000", // React dev server
-                "http://localhost:3001"
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:3002"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // 'Authorization' başlığını eklediğinizden emin olun
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
 
-        // Kimlik bilgisi (token/cookie) ile auth varsa bu önemlidir
         configuration.setAllowCredentials(true);
 
-        // CORS yapılandırmasını tüm yollara uygula
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

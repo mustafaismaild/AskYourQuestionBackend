@@ -7,12 +7,23 @@ import com.example.project.entity.res.VoteResponse;
 
 public class VoteMapper {
 
-    public static VoteResponse toResponse(Vote vote, int totalScore, boolean userVoted) {
+    public static VoteResponse toResponse(Vote vote, int totalScore, Integer userVote) {
+        if (vote == null) {
+            return null;
+        }
+
         VoteResponse response = new VoteResponse();
 
+        // Vote ID
         response.setVoteId(vote.getId());
-        response.setUserId(vote.getUser() != null ? vote.getUser().getId() : null);
-        response.setCommentId(vote.getComment() != null ? vote.getComment().getId() : null);
+
+        if (vote.getUser() != null) {
+            response.setUserId(vote.getUser().getId());
+        }
+
+        if (vote.getComment() != null) {
+            response.setCommentId(vote.getComment().getId());
+        }
 
         response.setAnswerId(null);
         response.setQuestionId(null);
@@ -21,6 +32,7 @@ public class VoteMapper {
             if (vote.getComment().getAnswer() != null) {
                 Answer ans = vote.getComment().getAnswer();
                 response.setAnswerId(ans.getId());
+
                 if (ans.getQuestion() != null) {
                     response.setQuestionId(ans.getQuestion().getId());
                 }
@@ -30,6 +42,7 @@ public class VoteMapper {
         }
         else if (vote.getAnswer() != null) {
             response.setAnswerId(vote.getAnswer().getId());
+
             if (vote.getAnswer().getQuestion() != null) {
                 response.setQuestionId(vote.getAnswer().getQuestion().getId());
             }
@@ -38,16 +51,17 @@ public class VoteMapper {
             response.setQuestionId(vote.getQuestion().getId());
         }
 
-        if (vote.getValue() != null) {
-            response.setValue(vote.getValue());
+        if (userVote != null) {
+            response.setUserVote(userVote);
+        } else if (vote.getValue() != null) {
+            response.setUserVote(vote.getValue());
         } else if (vote.getType() != null) {
-            response.setValue(vote.getType() == VoteType.UPVOTE ? 1 : -1);
+            response.setUserVote(vote.getType() == VoteType.UPVOTE ? 1 : -1);
         } else {
-            response.setValue(null);
+            response.setUserVote(0); // default
         }
 
         response.setTotalScore(totalScore);
-        response.setUserVoted(userVoted);
 
         return response;
     }

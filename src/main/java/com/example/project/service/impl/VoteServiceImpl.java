@@ -5,7 +5,6 @@ import com.example.project.entity.res.VoteResponse;
 import com.example.project.enums.VoteType;
 import com.example.project.mapper.VoteMapper;
 import com.example.project.repository.*;
-
 import com.example.project.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,15 +37,14 @@ public class VoteServiceImpl implements VoteService {
         vote.setQuestion(question);
         vote.setUser(user);
 
-        // Oy türünü belirle
         VoteType voteType = value == 1 ? VoteType.UPVOTE : VoteType.DOWNVOTE;
         vote.setType(voteType);
-
-        // Value alanını da set et (NOT NULL hatasını önlemek için)
-        vote.setValue(voteType == VoteType.UPVOTE ? 1 : -1);
         vote.setValue(value);
-        vote.setStatus(true); // soft delete mantığı
-        vote.setCreatedAt(LocalDateTime.now());
+        vote.setStatus(true);
+
+        if (vote.getCreatedAt() == null) {
+            vote.setCreatedAt(LocalDateTime.now());
+        }
         vote.setUpdatedAt(LocalDateTime.now());
 
         voteRepository.save(vote);
@@ -55,9 +53,8 @@ public class VoteServiceImpl implements VoteService {
                 .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
                 .sum();
 
-        return VoteMapper.toResponse(vote, totalScore, true);
+        return VoteMapper.toResponse(vote, totalScore, value);
     }
-
 
     @Override
     public VoteResponse voteAnswer(Long answerId, Long userId, int value) {
@@ -75,8 +72,9 @@ public class VoteServiceImpl implements VoteService {
         vote.setType(value == 1 ? VoteType.UPVOTE : VoteType.DOWNVOTE);
         vote.setValue(value);
         vote.setStatus(true);
+
         if (vote.getCreatedAt() == null) {
-            vote.setCreatedAt(LocalDateTime.now()); // sadece ilk kez oy verildiyse
+            vote.setCreatedAt(LocalDateTime.now());
         }
         vote.setUpdatedAt(LocalDateTime.now());
 
@@ -86,14 +84,15 @@ public class VoteServiceImpl implements VoteService {
                 .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
                 .sum();
 
-        return VoteMapper.toResponse(vote, totalScore, true);
+        return VoteMapper.toResponse(vote, totalScore, value);
     }
 
-    // ✅ Yoruma oy verme
     @Override
     public VoteResponse voteComment(Long commentId, Long userId, int value) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
 
         Vote vote = voteRepository.findByUserIdAndCommentIdAndStatus(userId, commentId, true)
                 .orElse(new Vote());
@@ -103,67 +102,79 @@ public class VoteServiceImpl implements VoteService {
         vote.setType(value == 1 ? VoteType.UPVOTE : VoteType.DOWNVOTE);
         vote.setValue(value);
         vote.setStatus(true);
-        vote.setCreatedAt(LocalDateTime.now());
+
+        if (vote.getCreatedAt() == null) {
+            vote.setCreatedAt(LocalDateTime.now());
+        }
         vote.setUpdatedAt(LocalDateTime.now());
 
         voteRepository.save(vote);
 
-        int totalScore = voteRepository.findAllByCommentIdAndStatus( commentId,true).stream()
+        int totalScore = voteRepository.findAllByCommentIdAndStatus(commentId, true).stream()
                 .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
                 .sum();
 
-        return VoteMapper.toResponse(vote, totalScore, true);
+        return VoteMapper.toResponse(vote, totalScore, value);
     }
 
-    // ✅ Oyları listeleme (soru bazlı)
     @Override
     public List<VoteResponse> getVotesByQuestion(Long userId, Long questionId) {
-        List<Vote> votes = voteRepository.findAllByQuestionIdAndStatus(questionId,true);
+        List<Vote> votes = voteRepository.findAllByQuestionIdAndStatus(questionId, true);
 
         int totalScore = votes.stream()
                 .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
                 .sum();
 
-        boolean userVoted = votes.stream().anyMatch(v -> v.getUser().getId().equals(userId));
+        // Kullanıcının oyu
+        Integer userVote = votes.stream()
+                .filter(v -> v.getUser().getId().equals(userId))
+                .map(Vote::getValue)
+                .findFirst()
+                .orElse(0);
 
         return votes.stream()
-                .map(v -> VoteMapper.toResponse(v, totalScore, userVoted))
+                .map(v -> VoteMapper.toResponse(v, totalScore, userVote))
                 .toList();
     }
 
-    // ✅ Oyları listeleme (cevap bazlı)
     @Override
     public List<VoteResponse> getVotesByAnswer(Long userId, Long answerId) {
-        List<Vote> votes = voteRepository.findAllByAnswerIdAndStatus( answerId,true);
+        List<Vote> votes = voteRepository.findAllByAnswerIdAndStatus(answerId, true);
 
         int totalScore = votes.stream()
                 .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
                 .sum();
 
-        boolean userVoted = votes.stream().anyMatch(v -> v.getUser().getId().equals(userId));
+        Integer userVote = votes.stream()
+                .filter(v -> v.getUser().getId().equals(userId))
+                .map(Vote::getValue)
+                .findFirst()
+                .orElse(0);
 
         return votes.stream()
-                .map(v -> VoteMapper.toResponse(v, totalScore, userVoted))
+                .map(v -> VoteMapper.toResponse(v, totalScore, userVote))
                 .toList();
     }
 
-    // ✅ Oyları listeleme (yorum bazlı)
     @Override
     public List<VoteResponse> getVotesByComment(Long userId, Long commentId) {
-        List<Vote> votes = voteRepository.findAllByCommentIdAndStatus( commentId,true);
+        List<Vote> votes = voteRepository.findAllByCommentIdAndStatus(commentId, true);
 
         int totalScore = votes.stream()
                 .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
                 .sum();
 
-        boolean userVoted = votes.stream().anyMatch(v -> v.getUser().getId().equals(userId));
+        Integer userVote = votes.stream()
+                .filter(v -> v.getUser().getId().equals(userId))
+                .map(Vote::getValue)
+                .findFirst()
+                .orElse(0);
 
         return votes.stream()
-                .map(v -> VoteMapper.toResponse(v, totalScore, userVoted))
+                .map(v -> VoteMapper.toResponse(v, totalScore, userVote))
                 .toList();
     }
 
-    // ✅ Oy sil (soft delete)
     @Override
     public void deleteVote(Long voteId) {
         voteRepository.findById(voteId).ifPresent(vote -> {

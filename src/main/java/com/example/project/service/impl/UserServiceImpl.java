@@ -28,9 +28,12 @@ public class UserServiceImpl implements UserService {
         UserResponse response = new UserResponse();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setRoles(user.getRoles());
         response.setStatus(user.isStatus());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
+        response.setAvatarUrl(user.getAvatarUrl()); // avatarUrl eklendi ✅
 
         if (user.getQuestions() != null && !user.getQuestions().isEmpty()) {
             response.setQuestions(
@@ -72,9 +75,8 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-
         // User -> SavedQuestions
-            if (user.getSavedQuestions() != null) {
+        if (user.getSavedQuestions() != null) {
             response.setSavedQuestions(
                     user.getSavedQuestions().stream()
                             .map(sq -> new SavedQuestionResponse(
@@ -115,7 +117,6 @@ public class UserServiceImpl implements UserService {
                 .map(this::toResponse);
     }
 
-
     @Override
     public UserResponse updateUser(User user) {
         user.setUpdatedAt(LocalDateTime.now());
@@ -130,5 +131,43 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
         });
+    }
+
+    // === Avatar güncelleme ===
+    @Override
+    public UserResponse updateAvatar(Long userId, String avatarUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAvatarUrl(avatarUrl);
+        user.setUpdatedAt(LocalDateTime.now());
+        User updated = userRepository.save(user);
+        return toResponse(updated);
+    }
+
+    // === Şifre değişimi ve validasyon yardımcıları ===
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsernameAndStatus(username, true)
+                .or(() -> userRepository.findByUsername(username))
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + username));
+    }
+
+    @Override
+    public void updatePassword(String username, String encodedPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + username));
+        user.setPassword(encodedPassword);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 }
