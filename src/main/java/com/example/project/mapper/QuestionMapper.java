@@ -21,6 +21,11 @@ public class QuestionMapper {
         response.setCreatedAt(question.getCreatedAt());
         response.setUpdatedAt(question.getUpdatedAt());
         response.setUserId(question.getUser() != null ? question.getUser().getId() : null);
+        response.setUserName(question.getUser() != null ? question.getUser().getUsername() : null);
+        
+        // ✅ Vote count ve view count ekle
+        response.setVoteCount(question.getVoteCount() != null ? question.getVoteCount() : 0);
+        response.setViewCount(question.getViewCount() != null ? question.getViewCount() : 0);
 
         if (question.getTags() != null && !question.getTags().isEmpty()) {
             response.setTags(
@@ -38,8 +43,10 @@ public class QuestionMapper {
                                 ansResp.setId(answer.getId());
                                 ansResp.setContent(answer.getContent());
                                 ansResp.setUserId(answer.getUser() != null ? answer.getUser().getId() : null);
+                                ansResp.setUsername(answer.getUser() != null ? answer.getUser().getUsername() : null);
                                 ansResp.setCreatedAt(answer.getCreatedAt());
                                 ansResp.setUpdatedAt(answer.getUpdatedAt());
+                                ansResp.setVoteCount(answer.getVoteCount() != null ? answer.getVoteCount() : 0);
                                 // Question bilgisi eklemiyoruz → döngüyü önler
                                 return ansResp;
                             })

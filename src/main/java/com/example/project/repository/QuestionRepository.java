@@ -37,4 +37,41 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     void markAsUnsolved(@Param("id") Long id);
 
     Optional<Question> findByIdAndUserId(Long id, Long userId);
+
+    @Query("SELECT DISTINCT q FROM Question q " +
+            "JOIN q.tags t " +
+            "WHERE t.name = :tagName AND q.status = true")
+    List<Question> findByTagName(@Param("tagName") String tagName);
+
+    @Query("SELECT DISTINCT q FROM Question q " +
+            "JOIN q.tags t " +
+            "WHERE t.id = :tagId AND q.status = true")
+    List<Question> findByTagId(@Param("tagId") Long tagId);
+
+    @Query("SELECT q FROM Question q WHERE q.user.id = :userId AND q.status = :status")
+    List<Question> findByUserIdAndStatus(@Param("userId") Long userId, @Param("status") boolean status);
+
+    // Gelişmiş arama ve sıralama
+    @Query("SELECT q FROM Question q WHERE q.status = true ORDER BY q.viewCount DESC")
+    List<Question> findMostViewed();
+
+    @Query("SELECT q FROM Question q WHERE q.status = true ORDER BY q.createdAt DESC")
+    List<Question> findLatest();
+
+    @Query("SELECT q FROM Question q WHERE q.status = true AND q.isSolved = false ORDER BY q.createdAt DESC")
+    List<Question> findUnanswered();
+
+    @Query("SELECT q FROM Question q WHERE q.status = true AND q.isSolved = true ORDER BY q.updatedAt DESC")
+    List<Question> findRecentlySolved();
+
+    // Full-text search (MySQL için)
+    @Query(value = "SELECT * FROM questions WHERE MATCH(title, content) AGAINST(:searchTerm IN NATURAL LANGUAGE MODE) AND status = true", 
+           nativeQuery = true)
+    List<Question> fullTextSearch(@Param("searchTerm") String searchTerm);
+
+    // View count artırma
+    @Modifying
+    @Transactional
+    @Query("UPDATE Question q SET q.viewCount = q.viewCount + 1 WHERE q.id = :id")
+    void incrementViewCount(@Param("id") Long id);
 }

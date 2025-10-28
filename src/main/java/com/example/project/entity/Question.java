@@ -26,9 +26,34 @@ public class Question extends BaseEntity {
     private byte[] fileData;
 
     private String fileName;
+    
+    @Column(name = "file_type")
+    private String fileType;
+    
+    @Column(name = "file_size")
+    private Long fileSize;
+    
+    @Column(name = "original_file_name")
+    private String originalFileName;
 
     @Column(nullable = false)
     private boolean isSolved = false;
+
+    @Column(name = "view_count", nullable = false)
+    private Integer viewCount = 0;
+
+    @Column(name = "vote_count", nullable = false)
+    private Integer voteCount = 0;
+
+    @Column(name = "upvote_count", nullable = false)
+    private Integer upvoteCount = 0;
+
+    @Column(name = "downvote_count", nullable = false)
+    private Integer downvoteCount = 0;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Vote> votes;
 
     @ManyToMany
     @JoinTable(
@@ -99,6 +124,30 @@ public class Question extends BaseEntity {
         this.fileUrl = fileUrl;
     }
 
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
+    }
+
     public boolean isSolved() {
         return isSolved;
     }
@@ -130,4 +179,19 @@ public class Question extends BaseEntity {
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
     }
+
+    public Integer getViewCount() { return viewCount; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+
+    public Integer getVoteCount() { return voteCount; }
+    public void setVoteCount(Integer voteCount) { this.voteCount = voteCount; }
+
+    public Integer getUpvoteCount() { return upvoteCount; }
+    public void setUpvoteCount(Integer upvoteCount) { this.upvoteCount = upvoteCount; }
+
+    public Integer getDownvoteCount() { return downvoteCount; }
+    public void setDownvoteCount(Integer downvoteCount) { this.downvoteCount = downvoteCount; }
+
+    public List<Vote> getVotes() { return votes; }
+    public void setVotes(List<Vote> votes) { this.votes = votes; }
 }

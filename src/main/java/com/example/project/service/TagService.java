@@ -16,4 +16,11 @@ public interface TagService {
     TagResponse updateTag(Long id, TagRequest request);
 
     void deleteTag(Long id);
+
+    void incrementQuestionCount(Long tagId);
+    void decrementQuestionCount(Long tagId);
+    void updateQuestionCount(Long tagId);
+
+    List<TagResponse> getPopularTags();
+    List<TagResponse> getPopularTags(int limit);
 }

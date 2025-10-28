@@ -1,7 +1,9 @@
 package com.example.project.controller;
 
 import com.example.project.entity.req.TagRequest;
+import com.example.project.entity.res.QuestionResponse;
 import com.example.project.entity.res.TagResponse;
+import com.example.project.service.QuestionService;
 import com.example.project.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import java.util.List;
 public class TagController {
 
     private final TagService tagService;
+    private final QuestionService questionService;
 
     @GetMapping
     public ResponseEntity<List<TagResponse>> getAllTags() {
@@ -41,5 +44,25 @@ public class TagController {
     public ResponseEntity<Void> deleteTag(@PathVariable Long id) {
         tagService.deleteTag(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/questions")
+    public ResponseEntity<List<QuestionResponse>> getQuestionsByTagId(@PathVariable Long id) {
+        return ResponseEntity.ok(questionService.getQuestionsByTagId(id));
+    }
+
+    @GetMapping("/name/{tagName}/questions")
+    public ResponseEntity<List<QuestionResponse>> getQuestionsByTagName(@PathVariable String tagName) {
+        return ResponseEntity.ok(questionService.getQuestionsByTagName(tagName));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<List<TagResponse>> getPopularTags() {
+        return ResponseEntity.ok(tagService.getPopularTags());
+    }
+
+    @GetMapping("/popular/{limit}")
+    public ResponseEntity<List<TagResponse>> getPopularTags(@PathVariable int limit) {
+        return ResponseEntity.ok(tagService.getPopularTags(limit));
     }
 }

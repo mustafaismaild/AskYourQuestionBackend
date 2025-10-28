@@ -144,6 +144,17 @@ public class UserServiceImpl implements UserService {
         return toResponse(updated);
     }
 
+    @Override
+    public UserResponse updateAvatarWithFile(Long userId, String fileName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAvatarFileName(fileName);
+        user.setAvatarUrl("/api/users/" + userId + "/avatar");
+        user.setUpdatedAt(LocalDateTime.now());
+        User updated = userRepository.save(user);
+        return toResponse(updated);
+    }
+
     // === Şifre değişimi ve validasyon yardımcıları ===
     @Override
     public User getUserByUsername(String username) {

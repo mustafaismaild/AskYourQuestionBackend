@@ -16,6 +16,15 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(name = "vote_count", nullable = false)
+    private Integer voteCount = 0;
+
+    @Column(name = "upvote_count", nullable = false)
+    private Integer upvoteCount = 0;
+
+    @Column(name = "downvote_count", nullable = false)
+    private Integer downvoteCount = 0;
+
     @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
@@ -33,9 +42,29 @@ public class Comment extends BaseEntity {
 
 
 
-    @Transient
-    public long getVoteCount() {
-        return votes == null ? 0 : votes.size();
+    // ✅ Artık veritabanında saklanıyor, @Transient kaldırıldı
+    public Integer getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(Integer voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    public Integer getUpvoteCount() {
+        return upvoteCount;
+    }
+
+    public void setUpvoteCount(Integer upvoteCount) {
+        this.upvoteCount = upvoteCount;
+    }
+
+    public Integer getDownvoteCount() {
+        return downvoteCount;
+    }
+
+    public void setDownvoteCount(Integer downvoteCount) {
+        this.downvoteCount = downvoteCount;
     }
 
     public Long getId() { return id; }

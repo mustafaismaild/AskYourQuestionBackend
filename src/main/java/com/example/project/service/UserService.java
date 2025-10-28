@@ -17,5 +17,6 @@ public interface UserService {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     UserResponse updateAvatar(Long userId, String avatarUrl);
+    UserResponse updateAvatarWithFile(Long userId, String fileName);
 
 }

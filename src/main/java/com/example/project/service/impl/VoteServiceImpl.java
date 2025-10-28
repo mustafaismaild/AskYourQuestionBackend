@@ -6,6 +6,7 @@ import com.example.project.enums.VoteType;
 import com.example.project.mapper.VoteMapper;
 import com.example.project.repository.*;
 import com.example.project.service.VoteService;
+import com.example.project.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class VoteServiceImpl implements VoteService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     @Override
     public VoteResponse voteQuestion(Long questionId, Long userId, int value) {
@@ -49,9 +51,16 @@ public class VoteServiceImpl implements VoteService {
 
         voteRepository.save(vote);
 
-        int totalScore = voteRepository.findAllByQuestionIdAndStatus(questionId, true).stream()
-                .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
-                .sum();
+        // ✅ Question'ın vote count'unu güncelle
+        updateQuestionVoteCount(questionId);
+
+        // Bildirim gönder - sadece kendi sorusuna oy vermiyorsa
+        if (!question.getUser().getId().equals(userId)) {
+            notificationService.notifyVoteReceived(question.getUser(), questionId, "QUESTION");
+        }
+
+        // Güncel toplam score'u veritabanından al
+        int totalScore = voteRepository.sumByQuestionId(questionId);
 
         return VoteMapper.toResponse(vote, totalScore, value);
     }
@@ -80,9 +89,16 @@ public class VoteServiceImpl implements VoteService {
 
         voteRepository.save(vote);
 
-        int totalScore = voteRepository.findAllByAnswerIdAndStatus(answerId, true).stream()
-                .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
-                .sum();
+        // ✅ Answer'ın vote count'unu güncelle
+        updateAnswerVoteCount(answerId);
+
+        // Bildirim gönder - sadece kendi cevabına oy vermiyorsa
+        if (!answer.getUser().getId().equals(userId)) {
+            notificationService.notifyVoteReceived(answer.getUser(), answerId, "ANSWER");
+        }
+
+        // Güncel toplam score'u veritabanından al
+        int totalScore = voteRepository.sumByAnswerId(answerId);
 
         return VoteMapper.toResponse(vote, totalScore, value);
     }
@@ -110,9 +126,16 @@ public class VoteServiceImpl implements VoteService {
 
         voteRepository.save(vote);
 
-        int totalScore = voteRepository.findAllByCommentIdAndStatus(commentId, true).stream()
-                .mapToInt(v -> v.getType() == VoteType.UPVOTE ? 1 : -1)
-                .sum();
+        // ✅ Comment'in vote count'unu güncelle
+        updateCommentVoteCount(commentId);
+
+        // Bildirim gönder - sadece kendi yorumuna oy vermiyorsa
+        if (!comment.getUser().getId().equals(userId)) {
+            notificationService.notifyVoteReceived(comment.getUser(), commentId, "COMMENT");
+        }
+
+        // Güncel toplam score'u veritabanından al
+        int totalScore = voteRepository.sumByCommentId(commentId);
 
         return VoteMapper.toResponse(vote, totalScore, value);
     }
@@ -176,11 +199,129 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
+    public int getQuestionTotalScore(Long questionId) {
+        return voteRepository.sumByQuestionId(questionId);
+    }
+
+    @Override
+    public int getAnswerTotalScore(Long answerId) {
+        return voteRepository.sumByAnswerId(answerId);
+    }
+
+    @Override
+    public int getCommentTotalScore(Long commentId) {
+        return voteRepository.sumByCommentId(commentId);
+    }
+
+    @Override
     public void deleteVote(Long voteId) {
         voteRepository.findById(voteId).ifPresent(vote -> {
             vote.setStatus(false);
             vote.setUpdatedAt(LocalDateTime.now());
             voteRepository.save(vote);
         });
+    }
+
+    @Override
+    public void removeQuestionVote(Long questionId, Long userId) {
+        voteRepository.findByUserIdAndQuestionIdAndStatus(userId, questionId, true)
+                .ifPresent(vote -> {
+                    vote.setStatus(false);
+                    vote.setUpdatedAt(LocalDateTime.now());
+                    voteRepository.save(vote);
+                    
+                    // ✅ Question'ın vote count'unu güncelle
+                    updateQuestionVoteCount(questionId);
+                });
+    }
+
+    @Override
+    public void removeAnswerVote(Long answerId, Long userId) {
+        voteRepository.findByUserIdAndAnswerIdAndStatus(userId, answerId, true)
+                .ifPresent(vote -> {
+                    vote.setStatus(false);
+                    vote.setUpdatedAt(LocalDateTime.now());
+                    voteRepository.save(vote);
+                    
+                    // ✅ Answer'ın vote count'unu güncelle
+                    updateAnswerVoteCount(answerId);
+                });
+    }
+
+    @Override
+    public void removeCommentVote(Long commentId, Long userId) {
+        voteRepository.findByUserIdAndCommentIdAndStatus(userId, commentId, true)
+                .ifPresent(vote -> {
+                    vote.setStatus(false);
+                    vote.setUpdatedAt(LocalDateTime.now());
+                    voteRepository.save(vote);
+                    
+                    // ✅ Comment'in vote count'unu güncelle
+                    updateCommentVoteCount(commentId);
+                });
+    }
+
+    @Override
+    public int getUserQuestionVote(Long questionId, Long userId) {
+        return voteRepository.findByUserIdAndQuestionIdAndStatus(userId, questionId, true)
+                .map(Vote::getValue)
+                .orElse(0);
+    }
+
+    @Override
+    public int getUserAnswerVote(Long answerId, Long userId) {
+        return voteRepository.findByUserIdAndAnswerIdAndStatus(userId, answerId, true)
+                .map(Vote::getValue)
+                .orElse(0);
+    }
+
+    @Override
+    public int getUserCommentVote(Long commentId, Long userId) {
+        return voteRepository.findByUserIdAndCommentIdAndStatus(userId, commentId, true)
+                .map(Vote::getValue)
+                .orElse(0);
+    }
+
+    // ✅ Vote count güncelleme metodları
+    private void updateQuestionVoteCount(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        
+        int voteCount = voteRepository.countByQuestionIdAndStatus(questionId, true);
+        int upvoteCount = voteRepository.countUpvotesByQuestionIdAndStatus(questionId, true);
+        int downvoteCount = voteRepository.countDownvotesByQuestionIdAndStatus(questionId, true);
+        
+        question.setVoteCount(voteCount);
+        question.setUpvoteCount(upvoteCount);
+        question.setDownvoteCount(downvoteCount);
+        questionRepository.save(question);
+    }
+
+    private void updateAnswerVoteCount(Long answerId) {
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
+        
+        int voteCount = voteRepository.countByAnswerIdAndStatus(answerId, true);
+        int upvoteCount = voteRepository.countUpvotesByAnswerIdAndStatus(answerId, true);
+        int downvoteCount = voteRepository.countDownvotesByAnswerIdAndStatus(answerId, true);
+        
+        answer.setVoteCount(voteCount);
+        answer.setUpvoteCount(upvoteCount);
+        answer.setDownvoteCount(downvoteCount);
+        answerRepository.save(answer);
+    }
+
+    private void updateCommentVoteCount(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        
+        int voteCount = voteRepository.countByCommentIdAndStatus(commentId, true);
+        int upvoteCount = voteRepository.countUpvotesByCommentIdAndStatus(commentId, true);
+        int downvoteCount = voteRepository.countDownvotesByCommentIdAndStatus(commentId, true);
+        
+        comment.setVoteCount(voteCount);
+        comment.setUpvoteCount(upvoteCount);
+        comment.setDownvoteCount(downvoteCount);
+        commentRepository.save(comment);
     }
 }

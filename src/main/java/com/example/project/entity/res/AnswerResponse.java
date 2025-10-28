@@ -9,9 +9,12 @@ public class AnswerResponse extends BaseResponse {
     private boolean accepted;
     private Long userId;
     private String username;
+    private String userAvatarUrl;
     private Long questionId;
     private boolean status =true;
     private int voteCount;
+    private int upvoteCount;
+    private int downvoteCount;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -36,6 +39,9 @@ public class AnswerResponse extends BaseResponse {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
+    public String getUserAvatarUrl() { return userAvatarUrl; }
+    public void setUserAvatarUrl(String userAvatarUrl) { this.userAvatarUrl = userAvatarUrl; }
+
     public Long getQuestionId() { return questionId; }
     public void setQuestionId(Long questionId) { this.questionId = questionId; }
 
@@ -45,5 +51,21 @@ public class AnswerResponse extends BaseResponse {
 
     public void setVoteCount(int voteCount) {
         this.voteCount = voteCount;
+    }
+
+    public int getUpvoteCount() {
+        return upvoteCount;
+    }
+
+    public void setUpvoteCount(int upvoteCount) {
+        this.upvoteCount = upvoteCount;
+    }
+
+    public int getDownvoteCount() {
+        return downvoteCount;
+    }
+
+    public void setDownvoteCount(int downvoteCount) {
+        this.downvoteCount = downvoteCount;
     }
 }

@@ -7,10 +7,12 @@ import com.example.project.entity.res.TokenResponse;
 import com.example.project.entity.res.UserResponse;
 import com.example.project.entity.req.LoginRequest;
 import com.example.project.entity.req.RegisterRequest;
+import com.example.project.exception.BusinessException;
 import com.example.project.security.JwtUtil;
 import com.example.project.service.AuthService;
 import com.example.project.service.PasswordResetService;
 import com.example.project.service.UserService;
+import com.example.project.util.ValidationUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +58,11 @@ public class AuthController {
     public UserResponse me(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
-            throw new RuntimeException("Authorization header missing or invalid");
+            throw new BusinessException(
+                "Authorization header eksik veya geçersiz",
+                "Invalid Authorization Header",
+                org.springframework.http.HttpStatus.UNAUTHORIZED
+            );
         }
         String token = header.substring(7);
         return authService.meFromToken(token);

@@ -12,6 +12,8 @@ public class QuestionRequest {
     private String content;
     private List<String> tags;
     private MultipartFile file;
+    private String imageBase64; // Base64 encoded image
+    private String imageType; // Image MIME type (e.g., "image/jpeg")
 
     public String getTitle() {
         return title;
@@ -43,5 +45,21 @@ public class QuestionRequest {
 
     public void setFile(MultipartFile file) {
         this.file = file;
+    }
+
+    public String getImageBase64() {
+        return imageBase64;
+    }
+
+    public void setImageBase64(String imageBase64) {
+        this.imageBase64 = imageBase64;
+    }
+
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
     }
 }

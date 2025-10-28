@@ -2,7 +2,7 @@ package com.example.project.entity.req;
 
 public class CommentRequest {
     private String content;
-    private Long questionId;
+    private Long questionId; // ✅ Artık opsiyonel - answerId'den otomatik çekiliyor
     private Long answerId;
 
     public Long getUserId() {

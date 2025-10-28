@@ -9,11 +9,15 @@ import com.example.project.repository.AnswerRepository;
 import com.example.project.repository.QuestionRepository;
 import com.example.project.repository.UserRepository;
 import com.example.project.service.AnswerService;
+import com.example.project.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +27,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
+    private final NotificationService notificationService;
 
     @Override
     public AnswerResponse createAnswer(AnswerRequest request, Long userId) {
@@ -39,12 +44,30 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setStatus(true);
         answer.setCreatedAt(LocalDateTime.now());
 
-        return mapToResponse(answerRepository.save(answer));
+        Answer savedAnswer = answerRepository.save(answer);
+        
+        // Bildirim gönder - sadece kendi sorusuna cevap vermiyorsa
+        if (!question.getUser().getId().equals(userId)) {
+            notificationService.notifyNewAnswer(question.getUser(), question.getId());
+        }
+
+        // Mention tespiti yap
+        detectAndNotifyMentions(answer.getContent(), user, savedAnswer.getId(), "ANSWER");
+
+        return mapToResponse(savedAnswer);
     }
 
     @Override
     public List<AnswerResponse> getAnswersByQuestion(Long questionId) {
         return answerRepository.findByQuestionIdAndStatus(questionId, true)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AnswerResponse> getAnswersByUser(Long userId) {
+        return answerRepository.findByUserIdAndStatus(userId, true)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -62,6 +85,23 @@ public class AnswerServiceImpl implements AnswerService {
             if (question != null) {
                 question.setSolved(true);
             }
+            
+            // Cevap sahibine bildirim gönder
+            notificationService.notifyAnswerAccepted(answer.getUser(), answer.getId());
+        });
+    }
+
+    @Override
+    public void deleteAcceptAnswer(Long id) {
+        answerRepository.findById(id).ifPresent(answer -> {
+            answer.setAccepted(false);
+            answer.setUpdatedAt(LocalDateTime.now());
+            answerRepository.save(answer);
+
+            Question question = answer.getQuestion();
+            if (question != null) {
+                question.setSolved(false);
+            }
         });
     }
 
@@ -72,6 +112,30 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setUpdatedAt(LocalDateTime.now());
             answerRepository.save(answer);
         });
+    }
+
+    @Override
+    public Optional<Answer> getAnswerById(Long id) {
+        return answerRepository.findById(id);
+    }
+
+    private void detectAndNotifyMentions(String content, User author, Long entityId, String entityType) {
+        if (content == null || content.trim().isEmpty()) {
+            return;
+        }
+        
+        Pattern mentionPattern = Pattern.compile("@(\\w+)");
+        Matcher matcher = mentionPattern.matcher(content);
+        
+        while (matcher.find()) {
+            String mentionedUsername = matcher.group(1);
+            userRepository.findByUsername(mentionedUsername).ifPresent(mentionedUser -> {
+                // Kendi kendini bahsetmiyorsa bildirim gönder
+                if (!mentionedUser.getId().equals(author.getId())) {
+                    notificationService.notifyMention(mentionedUser, author, entityId, entityType);
+                }
+            });
+        }
     }
 
     private AnswerResponse mapToResponse(Answer answer) {
@@ -85,6 +149,7 @@ public class AnswerServiceImpl implements AnswerService {
         if (answer.getUser() != null) {
             response.setUserId(answer.getUser().getId());
             response.setUsername(answer.getUser().getUsername());
+            response.setUserAvatarUrl("/api/users/" + answer.getUser().getId() + "/avatar");
         }
 
         if (answer.getQuestion() != null) {

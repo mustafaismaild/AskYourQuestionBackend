@@ -1,6 +1,7 @@
 package com.example.project.entity.res;
 
 import com.example.project.enums.Role;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserResponse extends BaseResponse {
@@ -12,6 +13,11 @@ public class UserResponse extends BaseResponse {
     private List<SavedQuestionResponse> savedQuestions;
     private List<Role> roles;
     private String avatarUrl;
+    private String bio;
+    private Integer questionCount;
+    private Integer reputation;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public UserResponse(Long id,
                         String username,
@@ -58,4 +64,19 @@ public class UserResponse extends BaseResponse {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public Integer getQuestionCount() { return questionCount; }
+    public void setQuestionCount(Integer questionCount) { this.questionCount = questionCount; }
+
+    public Integer getReputation() { return reputation; }
+    public void setReputation(Integer reputation) { this.reputation = reputation; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

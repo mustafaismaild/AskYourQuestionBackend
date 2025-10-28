@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface QuestionService {
 
     QuestionResponse saveQuestion(QuestionRequest questionRequest, Long userId, String userName);
+    QuestionResponse saveQuestionWithImage(QuestionRequest questionRequest, Long userId, String userName);
 
     Question updateQuestion(Question question, List<String> tagNames);
 
@@ -24,4 +25,19 @@ public interface QuestionService {
     List<QuestionResponse> getActiveQuestions();
 
     List<QuestionResponse> searchSimilarQuestions(String text);
+
+    List<QuestionResponse> getQuestionsByTagName(String tagName);
+
+    List<QuestionResponse> getQuestionsByTagId(Long tagId);
+
+    List<QuestionResponse> getQuestionsByUser(Long userId);
+
+    // ✅ Yeni eklenen metodlar
+    List<QuestionResponse> getMostViewedQuestions();
+    List<QuestionResponse> getMostVisitedQuestions();
+    List<QuestionResponse> getLatestQuestions();
+    List<QuestionResponse> getUnansweredQuestions();
+    List<QuestionResponse> getRecentlySolvedQuestions();
+    List<QuestionResponse> fullTextSearch(String searchTerm);
+    void incrementViewCount(Long questionId);
 }

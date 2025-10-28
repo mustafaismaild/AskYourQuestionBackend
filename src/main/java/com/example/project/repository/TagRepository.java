@@ -10,4 +10,5 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     List<Tag> findByStatus(boolean status);
     Optional<Tag> findByName(String name);
     Optional<Tag> findByIdAndStatus(Long id, boolean status);
+    List<Tag> findByStatusOrderByQuestionCountDesc(boolean status);
 }

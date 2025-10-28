@@ -14,6 +14,8 @@ public class VoteResponse {
     private Long commentId;
     private Integer userVote;
     private int totalScore;
+    private int upvoteCount;
+    private int downvoteCount;
 
     public Long getVoteId() {
         return voteId;
@@ -69,5 +71,21 @@ public class VoteResponse {
 
     public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
+    }
+
+    public int getUpvoteCount() {
+        return upvoteCount;
+    }
+
+    public void setUpvoteCount(int upvoteCount) {
+        this.upvoteCount = upvoteCount;
+    }
+
+    public int getDownvoteCount() {
+        return downvoteCount;
+    }
+
+    public void setDownvoteCount(int downvoteCount) {
+        this.downvoteCount = downvoteCount;
     }
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     List<Answer> findByQuestionIdAndStatus(Long questionId, boolean status);
+    List<Answer> findByUserIdAndStatus(Long userId, boolean status);
 }
